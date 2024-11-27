@@ -47,6 +47,16 @@ const App = () => {
     setNewNumber('')
   }
 
+  const deletePerson = (id) => {
+    if (window.confirm('Are you sure you want to delete this person?')) {
+      personService.remove(id).then(() => {
+        setPersons(persons.filter(person => person.id !== id))
+      }).catch(error => {
+        console.error('Error deleting person:', error)
+      })
+    }
+  }
+
   const filteredPersons = persons.filter(person =>
     person.name.toLowerCase().includes(search.toLowerCase())
   )
@@ -64,7 +74,7 @@ const App = () => {
         onNumberChange={handleNumberChange}
       />
       <h3>Numbers</h3>
-      <Persons persons={filteredPersons} />
+      <Persons persons={filteredPersons} onDelete={deletePerson} />
     </div>
   )
 }
