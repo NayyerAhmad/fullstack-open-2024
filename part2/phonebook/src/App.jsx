@@ -33,19 +33,28 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-    if (persons.some(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`)
+    const existingPerson = persons.find(person => person.name === newName)
+    
+    if (existingPerson) {
+      if (window.confirm(`${newName} is already in the phonebook. Do you want to update the number?`)) {
+        const updatedPerson = { ...existingPerson, number: newNumber }
+        personService.update(existingPerson.id, updatedPerson).then(returnedPerson => {
+          setPersons(persons.map(person => person.id !== existingPerson.id ? person : returnedPerson))
+        }).catch(error => {
+          console.error('Error updating person:', error)
+        })
+      }
     } else {
       const newPerson = { name: newName, number: newNumber }
       personService.create(newPerson).then(returnedPerson => {
-        setPersons(persons.concat(returnedPerson)) // Add to state after successful creation
+        setPersons(persons.concat(returnedPerson))
       }).catch(error => {
         console.error('Error adding person:', error)
       })
     }
     setNewName('')
     setNewNumber('')
-  }
+  }  
 
   const deletePerson = (id) => {
     if (window.confirm('Are you sure you want to delete this person?')) {
