@@ -16,4 +16,3 @@ const CountryList = ({ countries, onShowDetails }) => {
   };
   
   export default CountryList;
-  
