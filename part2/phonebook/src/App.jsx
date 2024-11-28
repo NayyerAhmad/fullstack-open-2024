@@ -1,15 +1,19 @@
+// App.jsx
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Filter from './Filter'
 import PersonForm from './PersonForm'
 import Persons from './Persons'
-import personService from './services/persons' // Import the service
+import personService from './services/persons'
+import Notification from './Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [search, setSearch] = useState('')
+  const [notification, setNotification] = useState(null)
+  const [notificationType, setNotificationType] = useState('')
 
   useEffect(() => {
     personService.getAll().then(response => {
@@ -34,34 +38,52 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
     const existingPerson = persons.find(person => person.name === newName)
-    
+
     if (existingPerson) {
       if (window.confirm(`${newName} is already in the phonebook. Do you want to update the number?`)) {
         const updatedPerson = { ...existingPerson, number: newNumber }
         personService.update(existingPerson.id, updatedPerson).then(returnedPerson => {
           setPersons(persons.map(person => person.id !== existingPerson.id ? person : returnedPerson))
+          setNotification(`Updated ${newName}'s number`)
+          setNotificationType('success')
+          setTimeout(() => setNotification(null), 5000)
         }).catch(error => {
           console.error('Error updating person:', error)
+          setNotification('Error updating number')
+          setNotificationType('error')
+          setTimeout(() => setNotification(null), 5000)
         })
       }
     } else {
       const newPerson = { name: newName, number: newNumber }
       personService.create(newPerson).then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
+        setNotification(`Added ${newName}`)
+        setNotificationType('success')
+        setTimeout(() => setNotification(null), 5000)
       }).catch(error => {
         console.error('Error adding person:', error)
+        setNotification('Error adding person')
+        setNotificationType('error')
+        setTimeout(() => setNotification(null), 5000)
       })
     }
     setNewName('')
     setNewNumber('')
-  }  
+  }
 
   const deletePerson = (id) => {
     if (window.confirm('Are you sure you want to delete this person?')) {
       personService.remove(id).then(() => {
         setPersons(persons.filter(person => person.id !== id))
+        setNotification('Person deleted')
+        setNotificationType('success')
+        setTimeout(() => setNotification(null), 5000)
       }).catch(error => {
         console.error('Error deleting person:', error)
+        setNotification('Error deleting person')
+        setNotificationType('error')
+        setTimeout(() => setNotification(null), 5000)
       })
     }
   }
@@ -73,6 +95,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} type={notificationType} />
       <Filter value={search} onChange={handleSearchChange} />
       <h3>Add a new</h3>
       <PersonForm
