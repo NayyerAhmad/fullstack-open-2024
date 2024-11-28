@@ -1,7 +1,13 @@
 const express = require('express');
+const morgan = require('morgan');
 const app = express();
 
 app.use(express.json());
+app.use(morgan('tiny'));
+
+morgan.token('body', (req) => JSON.stringify(req.body)); 
+
+app.use(morgan(':method :url :status :response-time ms - :body'));
 
 const phonebook = [
   { id: "1", name: "Arto Hellas", number: "040-123456" },
@@ -55,9 +61,9 @@ app.post('/api/persons', (req, res) => {
   
     const newId = Math.random().toString(36).substr(2, 9);
     const newPerson = { id: newId, name, number };
-    phonebook.push(newPerson);
+    phonebook.push(newPerson); 
     res.status(201).json(newPerson);
-  });
+});
 
 app.listen(3001, () => {
   console.log('Server running on http://localhost:3001');
