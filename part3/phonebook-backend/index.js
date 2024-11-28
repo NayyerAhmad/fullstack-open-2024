@@ -20,6 +20,15 @@ app.get('/info', (req, res) => {
     `);
   });
 
+app.get('/api/persons/:id', (req, res) => {
+    const person = phonebook.find(p => p.id === req.params.id);
+    if (person) {
+      res.json(person);
+    } else {
+      res.status(404).send({ error: 'Person not found' });
+    }
+  });
+
 app.listen(3001, () => {
   console.log('Server running on http://localhost:3001');
 });
