@@ -43,16 +43,21 @@ app.delete('/api/persons/:id', (req, res) => {
 });
 
 app.post('/api/persons', (req, res) => {
-  const { name, number } = req.body;
-  if (!name || !number) {
-    return res.status(400).send({ error: 'name or number is missing' });
-  }
-
-  const newId = Math.random().toString(36).substr(2, 9);
-  const newPerson = { id: newId, name, number };
-  phonebook.push(newPerson);
-  res.status(201).json(newPerson);
-});
+    const { name, number } = req.body;
+    if (!name || !number) {
+      return res.status(400).send({ error: 'name or number is missing' });
+    }
+  
+    const existingPerson = phonebook.find(p => p.name === name);
+    if (existingPerson) {
+      return res.status(400).send({ error: 'name must be unique' });
+    }
+  
+    const newId = Math.random().toString(36).substr(2, 9);
+    const newPerson = { id: newId, name, number };
+    phonebook.push(newPerson);
+    res.status(201).json(newPerson);
+  });
 
 app.listen(3001, () => {
   console.log('Server running on http://localhost:3001');
