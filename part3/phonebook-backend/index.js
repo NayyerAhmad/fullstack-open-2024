@@ -12,6 +12,14 @@ app.get('/api/persons', (req, res) => {
   res.json(phonebook);
 });
 
+app.get('/info', (req, res) => {
+    const currentTime = new Date();
+    res.send(`
+      <p>Phonebook has info for ${phonebook.length} people</p>
+      <p>${currentTime}</p>
+    `);
+  });
+
 app.listen(3001, () => {
   console.log('Server running on http://localhost:3001');
 });
