@@ -29,6 +29,17 @@ app.get('/api/persons/:id', (req, res) => {
     }
   });
 
+app.delete('/api/persons/:id', (req, res) => {
+    const id = req.params.id;
+    const index = phonebook.findIndex(p => p.id === id);
+    if (index !== -1) {
+      phonebook.splice(index, 1);
+      res.status(204).end();
+    } else {
+      res.status(404).send({ error: 'Person not found' });
+    }
+  });
+
 app.listen(3001, () => {
   console.log('Server running on http://localhost:3001');
 });
