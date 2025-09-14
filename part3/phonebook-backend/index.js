@@ -1,7 +1,9 @@
 const express = require('express')
 const app = express()
 
-const persons = [
+app.use(express.json()) // enable JSON body parsing
+
+let persons = [
   { id: "1", name: "Arto Hellas", number: "040-123456" },
   { id: "2", name: "Ada Lovelace", number: "39-44-5323523" },
   { id: "3", name: "Dan Abramov", number: "12-43-234345" },
@@ -17,7 +19,6 @@ app.get('/api/persons', (req, res) => {
 app.get('/api/persons/:id', (req, res) => {
   const id = req.params.id
   const person = persons.find(p => p.id === id)
-
   if (person) {
     res.json(person)
   } else {
@@ -28,14 +29,26 @@ app.get('/api/persons/:id', (req, res) => {
 // DELETE single person by ID
 app.delete('/api/persons/:id', (req, res) => {
   const id = req.params.id
-  const index = persons.findIndex(p => p.id === id)
+  persons = persons.filter(p => p.id !== id)
+  res.status(204).end()
+})
 
-  if (index !== -1) {
-    persons.splice(index, 1)
+// POST new person
+app.post('/api/persons', (req, res) => {
+  const body = req.body
+
+  if (!body.name || !body.number) {
+    return res.status(400).json({ error: 'name or number missing' })
   }
 
-  // Always respond with 204 no content
-  res.status(204).end()
+  const newPerson = {
+    id: String(Math.floor(Math.random() * 1000000)), // large range for unique id
+    name: body.name,
+    number: body.number
+  }
+
+  persons = persons.concat(newPerson)
+  res.json(newPerson)
 })
 
 // Info page
