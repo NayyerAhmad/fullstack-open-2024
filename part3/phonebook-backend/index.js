@@ -13,6 +13,18 @@ app.get('/api/persons', (req, res) => {
   res.json(persons)
 })
 
+// GET single person by ID
+app.get('/api/persons/:id', (req, res) => {
+  const id = req.params.id
+  const person = persons.find(p => p.id === id)
+
+  if (person) {
+    res.json(person)
+  } else {
+    res.status(404).end()
+  }
+})
+
 // Info page
 app.get('/info', (req, res) => {
   const currentTime = new Date()
