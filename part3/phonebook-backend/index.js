@@ -25,6 +25,19 @@ app.get('/api/persons/:id', (req, res) => {
   }
 })
 
+// DELETE single person by ID
+app.delete('/api/persons/:id', (req, res) => {
+  const id = req.params.id
+  const index = persons.findIndex(p => p.id === id)
+
+  if (index !== -1) {
+    persons.splice(index, 1)
+  }
+
+  // Always respond with 204 no content
+  res.status(204).end()
+})
+
 // Info page
 app.get('/info', (req, res) => {
   const currentTime = new Date()
