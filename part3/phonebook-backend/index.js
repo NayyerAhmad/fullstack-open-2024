@@ -1,7 +1,11 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 
 app.use(express.json())
+
+// Morgan middleware configured with 'tiny' format
+app.use(morgan('tiny'))
 
 let persons = [
   { id: "1", name: "Arto Hellas", number: "040-123456" },
@@ -65,6 +69,13 @@ app.get('/info', (req, res) => {
     <p>${currentTime}</p>
   `)
 })
+
+// Middleware for unknown endpoints
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
 
 const PORT = 3001
 app.listen(PORT, () => {
