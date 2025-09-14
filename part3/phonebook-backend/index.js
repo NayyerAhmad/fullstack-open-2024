@@ -8,8 +8,19 @@ const persons = [
   { id: "4", name: "Mary Poppendieck", number: "39-23-6423122" }
 ]
 
+// GET all persons
 app.get('/api/persons', (req, res) => {
   res.json(persons)
+})
+
+// Info page
+app.get('/info', (req, res) => {
+  const currentTime = new Date()
+  const count = persons.length
+  res.send(`
+    <p>Phonebook has info for ${count} people</p>
+    <p>${currentTime}</p>
+  `)
 })
 
 const PORT = 3001
