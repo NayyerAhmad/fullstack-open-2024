@@ -1,6 +1,5 @@
 // App.jsx
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import Filter from './Filter'
 import PersonForm from './PersonForm'
 import Persons from './Persons'
@@ -15,13 +14,14 @@ const App = () => {
   const [notification, setNotification] = useState(null)
   const [notificationType, setNotificationType] = useState('')
 
-  useEffect(() => {
-    personService.getAll().then(response => {
-      setPersons(response)
-    }).catch(error => {
-      console.error('There was an error fetching the persons:', error)
+useEffect(() => {
+  personService.getAll()
+    .then(response => {
+      console.log('Fetched persons:', response) // debug
+      setPersons(response) // response must be an array
     })
-  }, [])
+    .catch(error => console.error(error))
+}, [])
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
