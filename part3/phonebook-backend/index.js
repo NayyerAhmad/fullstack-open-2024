@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 
-app.use(express.json()) // enable JSON body parsing
+app.use(express.json())
 
 let persons = [
   { id: "1", name: "Arto Hellas", number: "040-123456" },
@@ -33,7 +33,7 @@ app.delete('/api/persons/:id', (req, res) => {
   res.status(204).end()
 })
 
-// POST new person
+// POST new person with error handling
 app.post('/api/persons', (req, res) => {
   const body = req.body
 
@@ -41,8 +41,13 @@ app.post('/api/persons', (req, res) => {
     return res.status(400).json({ error: 'name or number missing' })
   }
 
+  const nameExists = persons.some(p => p.name === body.name)
+  if (nameExists) {
+    return res.status(400).json({ error: 'name must be unique' })
+  }
+
   const newPerson = {
-    id: String(Math.floor(Math.random() * 1000000)), // large range for unique id
+    id: String(Math.floor(Math.random() * 1000000)),
     name: body.name,
     number: body.number
   }
