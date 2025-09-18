@@ -47,25 +47,24 @@ app.delete('/api/persons/:id', (req, res) => {
 })
 
 // POST new person
+// POST new person
 app.post('/api/persons', (req, res) => {
-  const { name, number } = req.body
+  const body = req.body
 
-  if (!name || !number) {
+  if (!body.name || !body.number) {
     return res.status(400).json({ error: 'name or number missing' })
   }
 
-  Person.findOne({ name })
-    .then(existingPerson => {
-      if (existingPerson) {
-        return res.status(400).json({ error: 'name must be unique' })
-      }
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  })
 
-      const person = new Person({ name, number })
-      person.save()
-        .then(savedPerson => res.json(savedPerson))
-        .catch(err => res.status(500).json({ error: 'Failed to save person' }))
-    })
+  person.save()
+    .then(savedPerson => res.json(savedPerson))
+    .catch(error => res.status(500).json({ error: 'failed to save person' }))
 })
+
 
 // PUT update person's number
 app.put('/api/persons/:id', (req, res) => {
