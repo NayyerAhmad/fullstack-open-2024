@@ -4,6 +4,7 @@ const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const Person = require('./models/person')
+const errorHandler = require('./middleware/errorHandler')
 
 const app = express()
 
@@ -27,7 +28,7 @@ app.get('/api/persons', (req, res) => {
 })
 
 // GET single person by ID
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
   Person.findById(req.params.id)
     .then(person => {
       if (person) {
@@ -36,7 +37,7 @@ app.get('/api/persons/:id', (req, res) => {
         res.status(404).end()
       }
     })
-    .catch(err => res.status(400).json({ error: 'malformatted id' }))
+    .catch(error => next(error)) // forward error to middleware
 })
 
 // DELETE single person by ID
@@ -44,12 +45,12 @@ app.delete('/api/persons/:id', (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
     .then(result => {
       if (result) {
-        res.status(204).end() // successfully deleted
+        res.status(204).end()
       } else {
-        res.status(404).json({ error: 'person not found' }) // id not in DB
+        res.status(404).json({ error: 'person not found' })
       }
     })
-    .catch(error => next(error)) // pass errors to error handler
+    .catch(error => next(error))
 })
 // POST new person
 app.post('/api/persons', (req, res) => {
@@ -100,15 +101,6 @@ const unknownEndpoint = (req, res) => {
 }
 app.use(unknownEndpoint)
 
-const errorHandler = (error, req, res, next) => {
-  console.error(error.message)
-
-  if (error.name === 'CastError') {
-    return res.status(400).send({ error: 'malformatted id' })
-  }
-
-  next(error) // pass on any other errors
-}
 app.use(errorHandler)
 
 // Start server
