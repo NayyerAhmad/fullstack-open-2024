@@ -28,16 +28,16 @@ app.get('/api/persons', (req, res) => {
 })
 
 // GET single person by ID
-app.get('/api/persons/:id', (req, res, next) => {
-  Person.findById(req.params.id)
+app.get('/api/persons/:id', (request, response, next) => {
+  Person.findById(request.params.id)
     .then(person => {
       if (person) {
-        res.json(person)
+        response.json(person)
       } else {
-        res.status(404).end()
+        response.status(404).end()
       }
     })
-    .catch(error => next(error)) // forward error to middleware
+    .catch(error => next(error)) // passes malformed id errors to errorHandler
 })
 
 // DELETE single person by ID
@@ -72,27 +72,35 @@ app.post('/api/persons', (req, res) => {
 
 
 // PUT update person's number
-app.put('/api/persons/:id', (req, res) => {
-  const { name, number } = req.body
+app.put('/api/persons/:id', (request, response, next) => {
+  const { name, number } = request.body
 
-  Person.findByIdAndUpdate(
-    req.params.id,
-    { name, number },
-    { new: true, runValidators: true, context: 'query' }
-  )
-    .then(updatedPerson => res.json(updatedPerson))
-    .catch(err => res.status(400).json({ error: 'malformatted id or validation error' }))
+  Person.findById(request.params.id)
+    .then(person => {
+      if (!person) {
+        return response.status(404).end()
+      }
+
+      person.name = name
+      person.number = number
+
+      return person.save().then(updatedPerson => {
+        response.json(updatedPerson)
+      })
+    })
+    .catch(error => next(error))
 })
 
 // Info page
-app.get('/info', (req, res) => {
+app.get('/info', (request, response, next) => {
   Person.countDocuments({})
     .then(count => {
-      res.send(`
-        <p>Phonebook has info for ${count} people</p>
-        <p>${new Date()}</p>
-      `)
+      const date = new Date()
+      response.send(
+        `<p>Phonebook has info for ${count} people</p><p>${date}</p>`
+      )
     })
+    .catch(error => next(error))
 })
 
 // Unknown endpoint middleware
