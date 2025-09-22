@@ -42,28 +42,32 @@ useEffect(() => {
     if (existingPerson) {
       if (window.confirm(`${newName} is already in the phonebook. Do you want to update the number?`)) {
         const updatedPerson = { ...existingPerson, number: newNumber }
-        personService.update(existingPerson.id, updatedPerson).then(returnedPerson => {
-          setPersons(persons.map(person => person.id !== existingPerson.id ? person : returnedPerson))
-          setNotification(`Updated ${newName}'s number`)
-          setNotificationType('success')
-          setTimeout(() => setNotification(null), 5000)
-        }).catch(error => {
-          console.error('Error updating person:', error)
-          setNotification('Error updating number')
-          setNotificationType('error')
-          setTimeout(() => setNotification(null), 5000)
-        })
+        personService.update(existingPerson.id, updatedPerson)
+      .then(returnedPerson => {
+        setPersons(persons.map(person => person.id !== existingPerson.id ? person : returnedPerson))
+        setNotification(`Updated ${newName}'s number`)
+        setNotificationType('success')
+        setTimeout(() => setNotification(null), 5000)
+      })
+      .catch(error => {
+        console.error('Error updating person:', error.response.data.error)
+        setNotification(error.response.data.error)
+        setNotificationType('error')
+        setTimeout(() => setNotification(null), 5000)
+      })
       }
     } else {
       const newPerson = { name: newName, number: newNumber }
-      personService.create(newPerson).then(returnedPerson => {
+      personService.create(newPerson)
+      .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
         setNotification(`Added ${newName}`)
         setNotificationType('success')
         setTimeout(() => setNotification(null), 5000)
-      }).catch(error => {
-        console.error('Error adding person:', error)
-        setNotification('Error adding person')
+      })
+      .catch(error => {
+        console.error('Error adding person:', error.response.data.error)
+        setNotification(error.response.data.error) // show mongoose validation error
         setNotificationType('error')
         setTimeout(() => setNotification(null), 5000)
       })
