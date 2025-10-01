@@ -17,8 +17,8 @@ const App = () => {
 useEffect(() => {
   personService.getAll()
     .then(response => {
-      console.log('Fetched persons:', response) // debug
-      setPersons(response) // response must be an array
+      console.log('Fetched persons:', response)
+      setPersons(response)
     })
     .catch(error => console.error(error))
 }, [])
